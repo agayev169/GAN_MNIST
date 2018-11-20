@@ -21,7 +21,7 @@ G_h3_n = 1024
 G_output_n = 784
 
 batch_size = 128
-learning_rate = 0.0002
+learning_rate = 0.001
 epochs_n = 1000
 
 X = tf.placeholder(tf.float32, shape=(None, 784))
