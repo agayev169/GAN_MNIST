@@ -31,7 +31,7 @@ def generator(X):
 	G_h1 = tf.layers.dense(X, G_h1_n, activation=tf.nn.leaky_relu)
 	G_h2 = tf.layers.dense(G_h1, G_h2_n, activation=tf.nn.leaky_relu)
 	G_h3 = tf.layers.dense(G_h2, G_h3_n, activation=tf.nn.leaky_relu)
-	G_output = tf.layers.dense(G_h3, G_output_n, activation=tf.nn.tanh)
+	G_output = tf.layers.dense(G_h3, G_output_n, activation=tf.nn.sigmoid)
 
 	return G_output
 

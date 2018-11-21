@@ -21,7 +21,7 @@ G_h3_n = 1024
 G_output_n = 784
 
 batch_size = 128
-learning_rate = 0.0002
+learning_rate = 0.001
 epochs_n = 100
 
 X = tf.placeholder(tf.float32, shape=(None, 784))
@@ -72,14 +72,13 @@ saver = tf.train.Saver(max_to_keep=None)
 with tf.Session() as sess:
 	sess.run(init)
 
-	for i in range(90, 101):
-		saver.restore(sess, "models2/model" + str(i) + ".ckpt")
-		z = np.random.normal(0, 1, (8, 100))
-		imgs = sess.run(G_z, {Z: z})
-		plt.figure(1, figsize=(20, 20))
-		plt.title("Epoch #" + str(i))
-		for j in range(len(imgs)):
-			plt.subplot(2, 4, j + 1)
-			plt.title("Img #" + str(j + 1))
-			plt.imshow(np.reshape(imgs[j], [28, 28]), interpolation='nearest', cmap='gray')
-		plt.show()
+	# for i in range(90, 101):
+	saver.restore(sess, "models/model" + str(501) + ".ckpt")
+	z = np.random.normal(0, 1, (8, 100))
+	imgs = sess.run(G_z, {Z: z})
+	plt.figure(1, figsize=(20, 20))
+	for j in range(len(imgs)):
+		plt.subplot(2, 4, j + 1)
+		plt.title("Img #" + str(j + 1))
+		plt.imshow(np.reshape(imgs[j], [28, 28]), interpolation='nearest', cmap='gray')
+	plt.show()
