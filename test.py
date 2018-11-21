@@ -31,7 +31,7 @@ def generator(X):
 	G_h1 = tf.layers.dense(X, G_h1_n, activation=tf.nn.leaky_relu)
 	G_h2 = tf.layers.dense(G_h1, G_h2_n, activation=tf.nn.leaky_relu)
 	G_h3 = tf.layers.dense(G_h2, G_h3_n, activation=tf.nn.leaky_relu)
-	G_output = tf.layers.dense(G_h3, G_output_n, activation=tf.nn.tanh)
+	G_output = tf.layers.dense(G_h3, G_output_n, activation=tf.nn.sigmoid)
 
 	return G_output
 
@@ -72,13 +72,16 @@ saver = tf.train.Saver(max_to_keep=None)
 with tf.Session() as sess:
 	sess.run(init)
 
-	# for i in range(90, 101):
-	saver.restore(sess, "models/model" + str(501) + ".ckpt")
-	z = np.random.normal(0, 1, (8, 100))
-	imgs = sess.run(G_z, {Z: z})
-	plt.figure(1, figsize=(20, 20))
-	for j in range(len(imgs)):
-		plt.subplot(2, 4, j + 1)
-		plt.title("Img #" + str(j + 1))
-		plt.imshow(np.reshape(imgs[j], [28, 28]), interpolation='nearest', cmap='gray')
-	plt.show()
+	for i in range(1, 12):
+		try:
+			saver.restore(sess, "models2/model" + str(i) + ".ckpt")
+			z = np.random.normal(0, 1, (8, 100))
+			imgs = sess.run(G_z, {Z: z})
+			plt.figure(1, figsize=(20, 20))
+			for j in range(len(imgs)):
+				plt.subplot(2, 4, j + 1)
+				plt.title("Img #" + str(j + 1))
+				plt.imshow(np.reshape(imgs[j], [28, 28]), interpolation='nearest', cmap='gray')
+			plt.show()
+		except Exception as e:
+			pass

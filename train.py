@@ -1,4 +1,4 @@
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 import sys
@@ -24,25 +24,34 @@ batch_size = 128
 learning_rate = 0.001
 epochs_n = 1000
 
-X = tf.placeholder(tf.float32, shape=(None, 784))
-Z = tf.placeholder(tf.float32, shape=(None, 100))
+X = tf.placeholder(tf.float32, shape=(None, D_input_n))
+Z = tf.placeholder(tf.float32, shape=(None, G_input_n))
 
 def generator(X):
-	G_h1 = tf.layers.dense(X, G_h1_n, activation=tf.nn.leaky_relu)
-	G_h2 = tf.layers.dense(G_h1, G_h2_n, activation=tf.nn.leaky_relu)
-	G_h3 = tf.layers.dense(G_h2, G_h3_n, activation=tf.nn.leaky_relu)
-	G_output = tf.layers.dense(G_h3, G_output_n, activation=tf.nn.sigmoid)
+	w_init = tf.truncated_normal_initializer(mean=0, stddev=0.02)
+
+	G_h1 = tf.layers.dense(X, G_h1_n, activation=tf.nn.relu, 
+		kernel_initializer=w_init)
+	G_h2 = tf.layers.dense(G_h1, G_h2_n, activation=tf.nn.relu, 
+		kernel_initializer=w_init)
+	G_h3 = tf.layers.dense(G_h2, G_h3_n, activation=tf.nn.relu, 
+		kernel_initializer=w_init)
+	G_output = tf.layers.dense(G_h3, G_output_n, activation=tf.nn.sigmoid, 
+		kernel_initializer=w_init)
 
 	return G_output
 
 def discriminator(X):
-	D_h1 = tf.layers.dropout(
-		tf.layers.dense(X, D_h1_n, activation=tf.nn.leaky_relu), 0.3)
-	D_h2 = tf.layers.dropout(
-		tf.layers.dense(D_h1, D_h2_n, activation=tf.nn.leaky_relu), 0.3)
-	D_h3 = tf.layers.dropout(
-		tf.layers.dense(D_h2, D_h3_n, activation=tf.nn.leaky_relu), 0.3)
-	D_output = tf.layers.dense(D_h3, D_output_n, activation=tf.nn.sigmoid)
+	w_init = tf.truncated_normal_initializer(mean=0, stddev=0.02)
+	
+	D_h1 = tf.layers.dropout(tf.layers.dense(X, D_h1_n, activation=tf.nn.relu, 
+		kernel_initializer=w_init), 0.3)
+	D_h2 = tf.layers.dropout(tf.layers.dense(D_h1, D_h2_n, activation=tf.nn.relu, 
+		kernel_initializer=w_init), 0.3)
+	D_h3 = tf.layers.dropout(tf.layers.dense(D_h2, D_h3_n, activation=tf.nn.relu, 
+		kernel_initializer=w_init), 0.3)
+	D_output = tf.layers.dense(D_h3, D_output_n, activation=tf.nn.sigmoid, 
+		kernel_initializer=w_init)
 
 	return D_output
 
@@ -93,11 +102,21 @@ with tf.Session() as sess:
 		print(epoch + 1, "epochs from", epochs_n)
 		print("Discriminator loss:", mean(D_losses[-len(mnist.train.images) // batch_size:]))
 		print("Generator loss:", mean(G_losses[-len(mnist.train.images) // batch_size:]))
-		print("Time spent for", epoch + 1, "epoch:", end_epoch - start_epoch)
+		print("Time spent for epoch#{}: {}".format(epoch + 1, end_epoch - start_epoch))
 
-		if epoch % 10 == 0:
-			save_path = saver.save(sess, "models2/model" + str(epoch + 1) + ".ckpt")
-			print("Model saved in path: %s" % save_path)
+		z = np.random.normal(0, 1, (8, 100))
+		imgs = sess.run(G_z, {Z: z})
+		plt.figure(1, figsize=(20, 20))
+		for j in range(len(imgs)):
+			plt.subplot(2, 4, j + 1)
+			plt.title("Img #" + str(j + 1))
+			plt.imshow(np.reshape(imgs[j], [28, 28]), interpolation='nearest', cmap='gray')
+		plt.savefig("epoch-{}.png".format(epoch))
+		plt.close()
+
+		# if epoch % 10 == 0:
+		save_path = saver.save(sess, "models/model" + str(epoch + 1) + ".ckpt")
+		print("Model saved in path: %s" % save_path)
 
 		print("")
 
