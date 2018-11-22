@@ -25,7 +25,7 @@ D_output_n = 1
 
 batch_size = 128
 learning_rate = 0.0001
-epochs_n = 30
+epochs_n = 20
 
 def generator(X, training=True):
 	with tf.variable_scope("generator", reuse=False):
@@ -86,8 +86,8 @@ t_vars = tf.trainable_variables()
 D_vars = [var for var in t_vars if var.name.startswith('discriminator')]
 G_vars = [var for var in t_vars if var.name.startswith('generator')]
 
-D_opt = tf.train.AdamOptimizer(learning_rate).minimize(D_loss, var_list=D_vars)
-G_opt = tf.train.AdamOptimizer(learning_rate).minimize(G_loss, var_list=G_vars)
+D_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(D_loss, var_list=D_vars)
+G_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(G_loss, var_list=G_vars)
 
 init = tf.global_variables_initializer()
 
@@ -127,9 +127,11 @@ with tf.Session() as sess:
 
 	print("Start of a training")
 	start_tr = time.time()
+	D_losses_per_epoch = []
+	G_losses_per_epoch = []
 	for epoch in range(epochs_n):
-		G_losses = []
 		D_losses = []
+		G_losses = []
 		start_epoch = time.time()
 
 		for _ in range(len(mnist.train.images) // batch_size):
@@ -144,10 +146,16 @@ with tf.Session() as sess:
 			loss_g, _ = sess.run([G_loss, G_opt], {Z: z, training: True})
 			G_losses.append(loss_g)
 
+		D_loss_per_epoch = mean(D_losses)
+		D_losses_per_epoch.append(D_loss_per_epoch)
+
+		G_loss_per_epoch = mean(G_losses)
+		G_losses_per_epoch.append(G_loss_per_epoch)
+
 		end_epoch = time.time()
 		print(epoch + 1, "epochs from", epochs_n)
-		print("Discriminator loss:", mean(D_losses[-len(mnist.train.images) // batch_size:]))
-		print("Generator loss:", mean(G_losses[-len(mnist.train.images) // batch_size:]))
+		print("Discriminator loss:", D_loss_per_epoch)
+		print("Generator loss:", G_loss_per_epoch)
 		print("Time spent for epoch #{}: {}".format(epoch + 1, end_epoch - start_epoch))
 
 		save_generated(5, 5, epoch + 1, fixed=True)
@@ -161,3 +169,10 @@ with tf.Session() as sess:
 	print("Discriminator loss:", mean(D_losses))
 	print("Generator loss:", mean(G_losses))
 	print("Time spent for training:", end_tr - start_tr)
+
+	plt.plot(D_losses_per_epoch, label="Discriminator loss")
+	plt.plot(G_losses_per_epoch, label="Generator loss")
+	plt.title("Losses")
+	plt.legend(loc="upper left")
+	plt.savefig("imgs/losses.png")
+	plt.close()
