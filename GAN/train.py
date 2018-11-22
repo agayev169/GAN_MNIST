@@ -7,19 +7,19 @@ import os
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-mnist = input_data.read_data_sets("MNIST_data/")
-
-D_input_n = 784
-D_h1_n = 1024
-D_h2_n = 512
-D_h3_n = 256
-D_output_n = 1
+mnist = input_data.read_data_sets("../MNIST_data/")
 
 G_input_n = 100
 G_h1_n = 256
 G_h2_n = 512
 G_h3_n = 1024
 G_output_n = 784
+
+D_input_n = 784
+D_h1_n = 1024
+D_h2_n = 512
+D_h3_n = 256
+D_output_n = 1
 
 batch_size = 128
 learning_rate = 0.0001
@@ -115,7 +115,6 @@ def save_generated(rows_n, cols_n, epoch, fixed=True, path="imgs"):
 		z = np.random.normal(0, 1, (rows_n * cols_n, 100))
 		imgs = sess.run(G_z, {Z: z})
 	plt.figure(1, figsize=(16, 16))
-	# plt.figure(1)
 	for j in range(len(imgs)):
 		plt.subplot(cols_n, rows_n, j + 1)
 		plt.title("Img #" + str(j + 1))
