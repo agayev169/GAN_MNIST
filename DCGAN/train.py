@@ -7,7 +7,7 @@ import os
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-mnist = input_data.read_data_sets("../MNIST_data/")
+mnist = input_data.read_data_sets("../MNIST_data/", reshape=[])
 
 G_input_n = (None, 1, 1, 100)
 G_conv1_n = 1024
