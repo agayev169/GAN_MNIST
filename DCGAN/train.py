@@ -107,7 +107,7 @@ def save_generated(rows_n, cols_n, epoch, fixed=True, path="imgs"):
 		pass
 
 	if fixed == True:
-		imgs = sess.run(G_z, {Z: fixed_z})
+		imgs = sess.run(G_z, {Z: fixed_z, training: False})
 	else:
 		z = np.random.normal(0, 1, (rows_n * cols_n, 1, 1, 100))
 		imgs = sess.run(G_z, {Z: z, training: False})
