@@ -125,15 +125,6 @@ with tf.Session() as sess:
 		G_losses = []
 		D_losses = []
 		start_epoch = time.time()
-		
-		imgs = sess.run(G_z, {Z: fixed_z})
-		plt.figure(1, figsize=(20, 20))
-		for j in range(len(imgs)):
-			plt.subplot(2, 4, j + 1)
-			plt.title("Img #" + str(j + 1))
-			plt.imshow(np.reshape(imgs[j], [28, 28]), cmap='gray')
-		plt.savefig("epoch-{}.png".format(epoch + 1))
-		plt.close()
 
 		for _ in range(len(mnist.train.images) // batch_size):
 			x, _ = mnist.train.next_batch(batch_size)
@@ -159,7 +150,7 @@ with tf.Session() as sess:
 			plt.subplot(2, 4, j + 1)
 			plt.title("Img #" + str(j + 1))
 			plt.imshow(np.reshape(imgs[j], [28, 28]), cmap='gray')
-		plt.savefig("epoch-{}.png".format(epoch + 1))
+		plt.savefig("imgs/epoch-{}.png".format(epoch + 1))
 		plt.close()
 
 		# if epoch % 10 == 0:
