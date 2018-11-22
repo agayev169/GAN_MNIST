@@ -71,8 +71,8 @@ Z = tf.placeholder(tf.float32, shape=G_input_n)
 training = tf.placeholder(dtype=tf.bool)
 
 G_z = generator(Z, training)
-D_real, D_real_logits = discriminator(X, training)
-D_fake, D_fake_logits = discriminator(G_z, training, True)
+D_real_logits, D_real = discriminator(X, training)
+D_fake_logits, D_fake = discriminator(G_z, training, True)
 
 D_loss_real = tf.reduce_mean(
 	tf.nn.sigmoid_cross_entropy_with_logits(logits=D_real_logits, labels=tf.ones([batch_size, 1, 1, 1])))
