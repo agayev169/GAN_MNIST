@@ -13,14 +13,12 @@ G_input_n = (None, 1, 1, 100)
 G_conv1_n = 1024
 G_conv2_n = 512
 G_conv3_n = 256
-G_conv4_n = 128
 G_output_n = 1
 
-D_input_n = (None, 64, 64, 1)
-D_conv1_n = 128
-D_conv2_n = 256
-D_conv3_n = 512
-D_conv4_n = 1024
+D_input_n = (None, 32, 32, 1)
+D_conv1_n = 256
+D_conv2_n = 512
+D_conv3_n = 1024
 D_output_n = 1
 
 batch_size = 128
@@ -38,10 +36,7 @@ def generator(X, training=True):
 		G_conv3 = tf.layers.conv2d_transpose(G_conv2, G_conv3_n, [4, 4], strides=(2, 2), padding='same')
 		G_conv3 = tf.nn.relu(tf.layers.batch_normalization(G_conv3, training=training))
 
-		G_conv4 = tf.layers.conv2d_transpose(G_conv3, G_conv4_n, [4, 4], strides=(2, 2), padding='same')
-		G_conv4 = tf.nn.relu(tf.layers.batch_normalization(G_conv4, training=training))
-
-		G_output = tf.layers.conv2d_transpose(G_conv4, G_output_n, [4, 4], strides=(2, 2), padding='same')
+		G_output = tf.layers.conv2d_transpose(G_conv3, G_output_n, [4, 4], strides=(2, 2), padding='same')
 		G_output = tf.nn.sigmoid(G_output)
 
 		return G_output
@@ -57,10 +52,7 @@ def discriminator(X, training, reuse=False):
 		D_conv3 = tf.layers.conv2d(D_conv2, D_conv3_n, [4, 4], strides=(2, 2), padding='same')
 		D_conv3 = tf.nn.relu(tf.layers.batch_normalization(D_conv3, training=training))
 
-		D_conv4 = tf.layers.conv2d(D_conv3, D_conv4_n, [4, 4], strides=(2, 2), padding='same')
-		D_conv4 = tf.nn.relu(tf.layers.batch_normalization(D_conv4, training=training))
-
-		D_output = tf.layers.conv2d(D_conv4, D_output_n, [4, 4], strides=(1, 1), padding='valid')
+		D_output = tf.layers.conv2d(D_conv3, D_output_n, [4, 4], strides=(1, 1), padding='valid')
 		D_output_s = tf.nn.sigmoid(D_output)
 
 		return D_output, D_output_s
@@ -86,8 +78,8 @@ t_vars = tf.trainable_variables()
 D_vars = [var for var in t_vars if var.name.startswith('discriminator')]
 G_vars = [var for var in t_vars if var.name.startswith('generator')]
 
-D_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(D_loss, var_list=D_vars)
-G_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(G_loss, var_list=G_vars)
+D_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.6).minimize(D_loss, var_list=D_vars)
+G_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.6).minimize(G_loss, var_list=G_vars)
 
 init = tf.global_variables_initializer()
 
@@ -115,12 +107,12 @@ def save_generated(rows_n, cols_n, epoch, fixed=True, path="imgs"):
 	for j in range(len(imgs)):
 		plt.subplot(cols_n, rows_n, j + 1)
 		plt.title("Img #" + str(j + 1))
-		plt.imshow(np.reshape(imgs[j], [64, 64]), cmap='gray')
+		plt.imshow(np.reshape(imgs[j], [32, 32]), cmap='gray')
 
 	plt.savefig(path + "/epoch-{}.png".format(epoch))   
 	plt.close()
 
-saver = tf.train.Saver(max_to_keep=None)
+# saver = tf.train.Saver(max_to_keep=None)
 
 with tf.Session() as sess:
 	sess.run(init)
@@ -136,7 +128,7 @@ with tf.Session() as sess:
 
 		for _ in range(len(mnist.train.images) // batch_size):
 			x, _ = mnist.train.next_batch(batch_size)
-			x = tf.image.resize_images(x, [64, 64]).eval()
+			x = tf.image.resize_images(x, [32, 32]).eval()
 			z = np.random.normal(0, 1, (batch_size, 1, 1, 100))
 
 			loss_d, _ = sess.run([D_loss, D_opt], {X: x, Z: z, training: True})
@@ -160,8 +152,8 @@ with tf.Session() as sess:
 
 		save_generated(5, 5, epoch + 1, fixed=True)
 
-		save_path = saver.save(sess, "models/model" + str(epoch + 1) + ".ckpt")
-		print("Model saved in path: %s" % save_path)
+		# save_path = saver.save(sess, "models/model" + str(epoch + 1) + ".ckpt")
+		# print("Model saved in path: %s" % save_path)
 
 		print("")
 
