@@ -39,35 +39,35 @@ def generator(X, training=True):
 		G_conv3 = tf.nn.relu(tf.layers.batch_normalization(G_conv3, training=training))
 
 		G_conv4 = tf.layers.conv2d_transpose(G_conv3, G_conv4_n, [4, 4], strides=(2, 2), padding='same')
-		G_conv4 = tf.nn.relu(tf.layers.batch_normalization(G_conv3, training=training))
+		G_conv4 = tf.nn.relu(tf.layers.batch_normalization(G_conv4, training=training))
 
 		G_output = tf.layers.conv2d_transpose(G_conv4, G_output_n, [4, 4], strides=(2, 2), padding='same')
 		G_output = tf.nn.sigmoid(G_output)
 
 		return G_output
 
-def discriminator(X):
-	with tf.variable_scope("discriminator", reuse=False):
-		D_conv1 = tf.layers.conv2d_transpose(X, D_conv1_n, [4, 4], strides=(2, 2), padding='same')
+def discriminator(X, training, reuse=False):
+	with tf.variable_scope("discriminator", reuse=reuse):
+		D_conv1 = tf.layers.conv2d(X, D_conv1_n, [4, 4], strides=(2, 2), padding='same')
 		D_conv1 = tf.nn.relu(tf.layers.batch_normalization(D_conv1, training=training))
 
-		D_conv2 = tf.layers.conv2d_transpose(D_conv1_n, D_conv2_n, [4, 4], strides=(2, 2), padding='same')
+		D_conv2 = tf.layers.conv2d(D_conv1, D_conv2_n, [4, 4], strides=(2, 2), padding='same')
 		D_conv2 = tf.nn.relu(tf.layers.batch_normalization(D_conv2, training=training))
 
-		D_conv3 = tf.layers.conv2d_transpose(D_conv2, D_conv3_n, [4, 4], strides=(2, 2), padding='same')
+		D_conv3 = tf.layers.conv2d(D_conv2, D_conv3_n, [4, 4], strides=(2, 2), padding='same')
 		D_conv3 = tf.nn.relu(tf.layers.batch_normalization(D_conv3, training=training))
 
-		D_conv4 = tf.layers.conv2d_transpose(D_conv3, D_conv4_n, [4, 4], strides=(2, 2), padding='same')
-		D_conv4 = tf.nn.relu(tf.layers.batch_normalization(D_conv3, training=training))
+		D_conv4 = tf.layers.conv2d(D_conv3, D_conv4_n, [4, 4], strides=(2, 2), padding='same')
+		D_conv4 = tf.nn.relu(tf.layers.batch_normalization(D_conv4, training=training))
 
-		D_output = tf.layers.conv2d_transpose(D_conv4, D_output_n, [4, 4], strides=(1, 1), padding='valid')
+		D_output = tf.layers.conv2d(D_conv4, D_output_n, [4, 4], strides=(1, 1), padding='valid')
 		D_output_s = tf.nn.sigmoid(D_output)
 
 		return D_output, D_output_s
 
 
-X = tf.placeholder(tf.float32, shape=(None, D_input_n))
-Z = tf.placeholder(tf.float32, shape=(None, G_input_n))
+X = tf.placeholder(tf.float32, shape=D_input_n)
+Z = tf.placeholder(tf.float32, shape=G_input_n)
 training = tf.placeholder(dtype=tf.bool)
 
 G_z = generator(Z, training)
@@ -110,7 +110,7 @@ def save_generated(rows_n, cols_n, epoch, fixed=True, path="imgs"):
 		imgs = sess.run(G_z, {Z: fixed_z})
 	else:
 		z = np.random.normal(0, 1, (rows_n * cols_n, 100))
-		imgs = sess.run(G_z, {Z: z})
+		imgs = sess.run(G_z, {Z: z, training: False})
 	plt.figure(1, figsize=(20, 20))
 	for j in range(len(imgs)):
 		plt.subplot(cols_n, rows_n, j + 1)
@@ -132,17 +132,18 @@ with tf.Session() as sess:
 		D_losses = []
 		start_epoch = time.time()
 
+		save_generated(5, 5, epoch + 1, fixed=False)
 
 		for _ in range(len(mnist.train.images) // batch_size):
 			x, _ = mnist.train.next_batch(batch_size)
 			x = tf.image.resize_images(x, [64, 64]).eval()
 			z = np.random.normal(0, 1, (batch_size, 1, 1, 100))
 
-			loss_d, _ = sess.run([D_loss, D_opt], {X: x, Z: z})
+			loss_d, _ = sess.run([D_loss, D_opt], {X: x, Z: z, training: True})
 			D_losses.append(loss_d)
 
 			z = np.random.normal(0, 1, (batch_size, 1, 1, 100))
-			loss_g, _ = sess.run([G_loss, G_opt], {Z: z})
+			loss_g, _ = sess.run([G_loss, G_opt], {Z: z, training: True})
 			G_losses.append(loss_g)
 
 		end_epoch = time.time()
