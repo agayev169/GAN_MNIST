@@ -27,64 +27,45 @@ epochs_n = 100
 
 def generator(X):
 	w_init = tf.truncated_normal_initializer(mean=0, stddev=0.02)
-	# b_init = tf.constant_initializer(0.)
+	b_init = tf.constant_initializer(0.)
 
-	# G_w0 = tf.get_variable('G_w0', [G_input_n, G_h1_n], initializer=w_init)
-	# G_b0 = tf.get_variable('G_b0', [G_h1_n], initializer=b_init)
-	# G_h0 = tf.nn.relu(tf.matmul(X, G_w0) + G_b0)
+	G_w0 = tf.get_variable('G_w0', [G_input_n, G_h1_n], initializer=w_init)
+	G_b0 = tf.get_variable('G_b0', [G_h1_n], initializer=b_init)
+	G_h0 = tf.nn.relu(tf.matmul(X, G_w0) + G_b0)
 
-	# G_w1 = tf.get_variable('G_w1', [G_h1_n, G_h2_n], initializer=w_init)
-	# G_b1 = tf.get_variable('G_b1', [G_h2_n], initializer=b_init)
-	# G_h1 = tf.nn.relu(tf.matmul(G_h0, G_w1) + G_b1)
+	G_w1 = tf.get_variable('G_w1', [G_h1_n, G_h2_n], initializer=w_init)
+	G_b1 = tf.get_variable('G_b1', [G_h2_n], initializer=b_init)
+	G_h1 = tf.nn.relu(tf.matmul(G_h0, G_w1) + G_b1)
 
-	# G_w2 = tf.get_variable('G_w2', [G_h2_n, G_h3_n], initializer=w_init)
-	# G_b2 = tf.get_variable('G_b2', [G_h3_n], initializer=b_init)
-	# G_h2 = tf.nn.relu(tf.matmul(G_h1, G_w2) + G_b2)
+	G_w2 = tf.get_variable('G_w2', [G_h2_n, G_h3_n], initializer=w_init)
+	G_b2 = tf.get_variable('G_b2', [G_h3_n], initializer=b_init)
+	G_h2 = tf.nn.relu(tf.matmul(G_h1, G_w2) + G_b2)
 
-	# G_w3 = tf.get_variable('G_w3', [G_h3_n, G_output_n], initializer=w_init)
-	# G_b3 = tf.get_variable('G_b3', [G_output_n], initializer=b_init)
-	# G_output = tf.nn.sigmoid(tf.matmul(G_h2, G_w3) + G_b3)
-
-
-	G_h1 = tf.layers.dense(X, G_h1_n, activation=tf.nn.relu, 
-		kernel_initializer=w_init)
-	G_h2 = tf.layers.dense(G_h1, G_h2_n, activation=tf.nn.relu, 
-		kernel_initializer=w_init)
-	G_h3 = tf.layers.dense(G_h2, G_h3_n, activation=tf.nn.relu, 
-		kernel_initializer=w_init)
-	G_output = tf.layers.dense(G_h3, G_output_n, activation=tf.nn.sigmoid, 
-		kernel_initializer=w_init)
+	G_w3 = tf.get_variable('G_w3', [G_h3_n, G_output_n], initializer=w_init)
+	G_b3 = tf.get_variable('G_b3', [G_output_n], initializer=b_init)
+	G_output = tf.nn.sigmoid(tf.matmul(G_h2, G_w3) + G_b3)
 
 	return G_output
 
 def discriminator(X):
 	w_init = tf.truncated_normal_initializer(mean=0, stddev=0.02)
-	# b_init = tf.constant_initializer(0.)
+	b_init = tf.constant_initializer(0.)
 
-	# D_w0 = tf.get_variable('D_w0', [D_input_n, D_h1_n], initializer=w_init)
-	# D_b0 = tf.get_variable('D_b0', [D_h1_n], initializer=b_init)
-	# D_h0 = tf.nn.dropout(tf.nn.relu(tf.matmul(X, D_w0) + D_b0), 0.3)
+	D_w0 = tf.get_variable('D_w0', [D_input_n, D_h1_n], initializer=w_init)
+	D_b0 = tf.get_variable('D_b0', [D_h1_n], initializer=b_init)
+	D_h0 = tf.nn.dropout(tf.nn.relu(tf.matmul(X, D_w0) + D_b0), 0.3)
 
-	# D_w1 = tf.get_variable('D_w1', [D_h1_n, D_h2_n], initializer=w_init)
-	# D_b1 = tf.get_variable('D_b1', [D_h2_n], initializer=b_init)
-	# D_h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(D_h0, D_w1) + D_b1), 0.3)
+	D_w1 = tf.get_variable('D_w1', [D_h1_n, D_h2_n], initializer=w_init)
+	D_b1 = tf.get_variable('D_b1', [D_h2_n], initializer=b_init)
+	D_h1 = tf.nn.dropout(tf.nn.relu(tf.matmul(D_h0, D_w1) + D_b1), 0.3)
 
-	# D_w2 = tf.get_variable('D_w2', [D_h2_n, D_h3_n], initializer=w_init)
-	# D_b2 = tf.get_variable('D_b2', [D_h3_n], initializer=b_init)
-	# D_h2 = tf.nn.dropout(tf.nn.relu(tf.matmul(D_h1, D_w2) + D_b2), 0.3)
+	D_w2 = tf.get_variable('D_w2', [D_h2_n, D_h3_n], initializer=w_init)
+	D_b2 = tf.get_variable('D_b2', [D_h3_n], initializer=b_init)
+	D_h2 = tf.nn.dropout(tf.nn.relu(tf.matmul(D_h1, D_w2) + D_b2), 0.3)
 
-	# D_w3 = tf.get_variable('D_w3', [D_h3_n, D_output_n], initializer=w_init)
-	# D_b3 = tf.get_variable('D_b3', [D_output_n], initializer=b_init)
-	# D_output = tf.nn.sigmoid(tf.matmul(D_h2, D_w3) + D_b3)
-	
-	D_h1 = tf.layers.dropout(tf.layers.dense(X, D_h1_n, activation=tf.nn.relu, 
-		kernel_initializer=w_init), 0.3)
-	D_h2 = tf.layers.dropout(tf.layers.dense(D_h1, D_h2_n, activation=tf.nn.relu, 
-		kernel_initializer=w_init), 0.3)
-	D_h3 = tf.layers.dropout(tf.layers.dense(D_h2, D_h3_n, activation=tf.nn.relu, 
-		kernel_initializer=w_init), 0.3)
-	D_output = tf.layers.dense(D_h3, D_output_n, activation=tf.nn.sigmoid, 
-		kernel_initializer=w_init)
+	D_w3 = tf.get_variable('D_w3', [D_h3_n, D_output_n], initializer=w_init)
+	D_b3 = tf.get_variable('D_b3', [D_output_n], initializer=b_init)
+	D_output = tf.nn.sigmoid(tf.matmul(D_h2, D_w3) + D_b3)
 
 	return D_output
 
@@ -112,18 +93,39 @@ G_opt = tf.train.AdamOptimizer(learning_rate).minimize(G_loss, var_list=G_vars)
 
 init = tf.global_variables_initializer()
 
+
 def mean(data):
 	avg = 0
 	for x in data:
 		avg += x
 	return avg / len(data)
 
+
+fixed_z = np.random.normal(0, 1, (25, 100))
+
+def save_generated(rows_n, cols_n, epoch, fixed=True, path="imgs"):
+	try:
+		os.mkdir(path)
+	except Exception as e:
+		pass
+
+	if fixed == True:
+		imgs = sess.run(G_z, {Z: fixed_z})
+	else:
+		z = np.random.normal(0, 1, (rows_n * cols_n, 100))
+		imgs = sess.run(G_z, {Z: z})
+	plt.figure(1, figsize=(16, 16))
+	# plt.figure(1)
+	for j in range(len(imgs)):
+		plt.subplot(cols_n, rows_n, j + 1)
+		plt.title("Img #" + str(j + 1))
+		plt.imshow(np.reshape(imgs[j], [28, 28]), cmap='gray')
+
+	plt.savefig(path + "/epoch-{}.png".format(epoch))   
+	plt.close()
+
 saver = tf.train.Saver(max_to_keep=None)
 
-imgs_dir = "imgs"
-os.mkdir(imgs_dir)
-
-fixed_z = np.random.normal(0, 1, (8, 100))
 with tf.Session() as sess:
 	sess.run(init)
 
@@ -133,6 +135,9 @@ with tf.Session() as sess:
 		G_losses = []
 		D_losses = []
 		start_epoch = time.time()
+
+		save_generated(5, 5, epoch + 1)
+
 
 		for _ in range(len(mnist.train.images) // batch_size):
 			x, _ = mnist.train.next_batch(batch_size)
@@ -151,18 +156,7 @@ with tf.Session() as sess:
 		print("Generator loss:", mean(G_losses[-len(mnist.train.images) // batch_size:]))
 		print("Time spent for epoch #{}: {}".format(epoch + 1, end_epoch - start_epoch))
 
-		# z = np.random.normal(0, 1, (8, 100))
-		imgs = sess.run(G_z, {Z: fixed_z})
-		plt.figure(1, figsize=(20, 20))
-		for j in range(len(imgs)):
-			plt.subplot(2, 4, j + 1)
-			plt.title("Img #" + str(j + 1))
-			plt.imshow(np.reshape(imgs[j], [28, 28]), cmap='gray')
 
-		plt.savefig(imgs_dir + "/epoch-{}.png".format(epoch + 1))   
-		plt.close()
-
-		# if epoch % 10 == 0:
 		save_path = saver.save(sess, "models/model" + str(epoch + 1) + ".ckpt")
 		print("Model saved in path: %s" % save_path)
 
