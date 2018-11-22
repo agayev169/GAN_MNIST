@@ -132,8 +132,6 @@ with tf.Session() as sess:
 		D_losses = []
 		start_epoch = time.time()
 
-		save_generated(5, 5, epoch + 1, fixed=False)
-
 		for _ in range(len(mnist.train.images) // batch_size):
 			x, _ = mnist.train.next_batch(batch_size)
 			x = tf.image.resize_images(x, [64, 64]).eval()
