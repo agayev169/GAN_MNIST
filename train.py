@@ -150,7 +150,7 @@ with tf.Session() as sess:
 			plt.subplot(2, 4, j + 1)
 			plt.title("Img #" + str(j + 1))
 			plt.imshow(np.reshape(imgs[j], [28, 28]), cmap='gray')
-		plt.savefig("imgs/epoch-{}.png".format(epoch + 1))
+		plt.savefig("epoch-{}.png".format(epoch + 1))
 		plt.close()
 
 		# if epoch % 10 == 0:
