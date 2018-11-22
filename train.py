@@ -22,7 +22,7 @@ G_output_n = 784
 
 batch_size = 128
 learning_rate = 0.0002
-epochs_n = 1000
+epochs_n = 100
 
 def generator(X):
 	w_init = tf.truncated_normal_initializer(mean=0, stddev=0.02)
