@@ -102,8 +102,12 @@ eps = 1e-2
 D_loss = tf.reduce_mean(-tf.log(D_real + eps) - tf.log(1 - D_fake + eps))
 G_loss = tf.reduce_mean(-tf.log(D_fake + eps))
 
-D_opt = tf.train.AdamOptimizer(learning_rate).minimize(D_loss)
-G_opt = tf.train.AdamOptimizer(learning_rate).minimize(G_loss)
+t_vars = tf.trainable_variables()
+D_vars = [var for var in t_vars if 'D_' in var.name]
+G_vars = [var for var in t_vars if 'G_' in var.name]
+
+D_opt = tf.train.AdamOptimizer(learning_rate).minimize(D_loss, var_list=D_vars)
+G_opt = tf.train.AdamOptimizer(learning_rate).minimize(G_loss, var_list=G_vars)
 
 init = tf.global_variables_initializer()
 
