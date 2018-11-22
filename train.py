@@ -136,8 +136,6 @@ with tf.Session() as sess:
 		D_losses = []
 		start_epoch = time.time()
 
-		save_generated(5, 5, epoch + 1)
-
 
 		for _ in range(len(mnist.train.images) // batch_size):
 			x, _ = mnist.train.next_batch(batch_size)
@@ -156,6 +154,7 @@ with tf.Session() as sess:
 		print("Generator loss:", mean(G_losses[-len(mnist.train.images) // batch_size:]))
 		print("Time spent for epoch #{}: {}".format(epoch + 1, end_epoch - start_epoch))
 
+		save_generated(5, 5, epoch + 1, fixed=False)
 
 		save_path = saver.save(sess, "models/model" + str(epoch + 1) + ".ckpt")
 		print("Model saved in path: %s" % save_path)
