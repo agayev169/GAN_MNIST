@@ -22,7 +22,7 @@ G_h3_n = 1024
 G_output_n = 784
 
 batch_size = 128
-learning_rate = 0.001
+learning_rate = 0.0001
 epochs_n = 100
 
 def generator(X):
