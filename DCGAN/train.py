@@ -110,7 +110,7 @@ def save_generated(rows_n, cols_n, epoch, fixed=True, path="imgs"):
 		imgs = sess.run(G_z, {Z: fixed_z})
 	else:
 		z = np.random.normal(0, 1, (rows_n * cols_n, 1, 1, 100))
-		imgs = sess.run(G_z, {Z: fixed_z, training: False})
+		imgs = sess.run(G_z, {Z: z, training: False})
 	plt.figure(1, figsize=(20, 20))
 	for j in range(len(imgs)):
 		plt.subplot(cols_n, rows_n, j + 1)
@@ -150,7 +150,7 @@ with tf.Session() as sess:
 		print("Generator loss:", mean(G_losses[-len(mnist.train.images) // batch_size:]))
 		print("Time spent for epoch #{}: {}".format(epoch + 1, end_epoch - start_epoch))
 
-		save_generated(5, 5, epoch + 1, fixed=False)
+		save_generated(5, 5, epoch + 1, fixed=True)
 
 		save_path = saver.save(sess, "models/model" + str(epoch + 1) + ".ckpt")
 		print("Model saved in path: %s" % save_path)
