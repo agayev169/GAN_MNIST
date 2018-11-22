@@ -25,7 +25,7 @@ D_output_n = 1
 
 batch_size = 128
 learning_rate = 0.0001
-epochs_n = 100
+epochs_n = 30
 
 def generator(X, training=True):
 	with tf.variable_scope("generator", reuse=False):
@@ -109,8 +109,8 @@ def save_generated(rows_n, cols_n, epoch, fixed=True, path="imgs"):
 	if fixed == True:
 		imgs = sess.run(G_z, {Z: fixed_z})
 	else:
-		z = np.random.normal(0, 1, (rows_n * cols_n, 100))
-		imgs = sess.run(G_z, {Z: z, training: False})
+		z = np.random.normal(0, 1, (rows_n * cols_n, 1, 1, 100))
+		imgs = sess.run(G_z, {Z: fixed_z, training: False})
 	plt.figure(1, figsize=(20, 20))
 	for j in range(len(imgs)):
 		plt.subplot(cols_n, rows_n, j + 1)
