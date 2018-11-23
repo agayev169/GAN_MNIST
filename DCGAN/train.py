@@ -37,7 +37,7 @@ def generator(X, training=True):
 		G_conv3 = tf.nn.relu(tf.layers.batch_normalization(G_conv3, training=training))
 
 		G_output = tf.layers.conv2d_transpose(G_conv3, G_output_n, [4, 4], strides=(2, 2), padding='same')
-		G_output = tf.nn.sigmoid(G_output)
+		G_output = tf.nn.tanh(G_output)
 
 		return G_output
 
@@ -78,8 +78,9 @@ t_vars = tf.trainable_variables()
 D_vars = [var for var in t_vars if var.name.startswith('discriminator')]
 G_vars = [var for var in t_vars if var.name.startswith('generator')]
 
-D_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.6).minimize(D_loss, var_list=D_vars)
-G_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.6).minimize(G_loss, var_list=G_vars)
+with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+	D_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.9).minimize(D_loss, var_list=D_vars)
+	G_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.9).minimize(G_loss, var_list=G_vars)
 
 init = tf.global_variables_initializer()
 
@@ -129,6 +130,7 @@ with tf.Session() as sess:
 		for _ in range(len(mnist.train.images) // batch_size):
 			x, _ = mnist.train.next_batch(batch_size)
 			x = tf.image.resize_images(x, [32, 32]).eval()
+			x = (x - 0.5) * 2
 			z = np.random.normal(0, 1, (batch_size, 1, 1, 100))
 
 			loss_d, _ = sess.run([D_loss, D_opt], {X: x, Z: z, training: True})
