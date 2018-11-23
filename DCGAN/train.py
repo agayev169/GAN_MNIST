@@ -58,9 +58,9 @@ def discriminator(X, training, reuse=False):
 		return D_output, D_output_s
 
 
-X = tf.placeholder(tf.float32, shape=D_input_n)
-Z = tf.placeholder(tf.float32, shape=G_input_n)
-training = tf.placeholder(dtype=tf.bool)
+X = tf.placeholder(tf.float32, shape=D_input_n, name='X')
+Z = tf.placeholder(tf.float32, shape=G_input_n, name='Z')
+training = tf.placeholder(dtype=tf.bool, name='training')
 
 G_z = generator(Z, training)
 D_real_logits, D_real = discriminator(X, training)
@@ -137,7 +137,7 @@ with tf.Session() as sess:
 			D_losses.append(loss_d)
 
 			z = np.random.normal(0, 1, (batch_size, 1, 1, 100))
-			loss_g, _ = sess.run([G_loss, G_opt], {Z: z, training: True})
+			loss_g, _ = sess.run([G_loss, G_opt], {X: x, Z: z, training: True})
 			G_losses.append(loss_g)
 
 		D_loss_per_epoch = mean(D_losses)
