@@ -79,8 +79,8 @@ D_vars = [var for var in t_vars if var.name.startswith('discriminator')]
 G_vars = [var for var in t_vars if var.name.startswith('generator')]
 
 with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-	D_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.9).minimize(D_loss, var_list=D_vars)
-	G_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.9).minimize(G_loss, var_list=G_vars)
+	D_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(D_loss, var_list=D_vars)
+	G_opt = tf.train.AdamOptimizer(learning_rate, beta1=0.5).minimize(G_loss, var_list=G_vars)
 
 init = tf.global_variables_initializer()
 
